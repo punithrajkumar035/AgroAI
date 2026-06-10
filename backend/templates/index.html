@@ -1,0 +1,1033 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>AgroAI</title>
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <!-- CHART JS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+
+        body{
+
+            font-family:'Segoe UI';
+
+            background:
+            linear-gradient(
+                135deg,
+                #1b5e20,
+                #4CAF50
+            );
+
+            color:white;
+
+            min-height:100vh;
+
+            text-align:center;
+
+            padding-bottom:50px;
+        }
+
+        h1{
+
+            padding-top:20px;
+
+            font-size:42px;
+        }
+
+        p{
+            margin-top:10px;
+        }
+
+        .section{
+            display:none;
+        }
+
+        .active{
+            display:block;
+        }
+
+        .container{
+
+            background:white;
+
+            color:black;
+
+            width:95%;
+
+            max-width:1100px;
+
+            margin:20px auto;
+
+            padding:25px;
+
+            border-radius:20px;
+
+            box-shadow:
+            0 10px 30px rgba(
+                0,0,0,0.3
+            );
+        }
+
+        button{
+
+            background:#2e7d32;
+
+            color:white;
+
+            border:none;
+
+            padding:14px;
+
+            margin:10px;
+
+            width:90%;
+
+            border-radius:12px;
+
+            cursor:pointer;
+
+            font-size:16px;
+
+            transition:0.3s;
+        }
+
+        button:hover{
+
+            background:#1b5e20;
+
+            transform:scale(1.02);
+        }
+
+        input,select{
+
+            width:90%;
+
+            padding:12px;
+
+            margin:8px;
+
+            border-radius:10px;
+
+            border:1px solid #ccc;
+
+            font-size:15px;
+        }
+
+        .grid{
+
+            display:grid;
+
+            grid-template-columns:
+            repeat(auto-fit,minmax(250px,1fr));
+
+            gap:20px;
+
+            margin-top:20px;
+        }
+
+        .card{
+
+            background:#f5f5f5;
+
+            padding:20px;
+
+            border-radius:15px;
+        }
+
+        .preview-image{
+
+            width:100%;
+
+            max-width:300px;
+
+            height:250px;
+
+            object-fit:cover;
+
+            border-radius:15px;
+
+            border:3px solid #ddd;
+        }
+
+        .result-box{
+
+            text-align:left;
+
+            margin-top:20px;
+
+            line-height:1.8;
+        }
+
+        ul{
+            margin-left:20px;
+        }
+
+        .graph-container{
+
+            width:100%;
+
+            max-width:600px;
+
+            margin:auto;
+        }
+
+        .health-score{
+
+            font-size:30px;
+
+            color:#2e7d32;
+
+            font-weight:bold;
+        }
+
+        .buy-btn{
+
+            display:inline-block;
+
+            background:#ff9800;
+
+            color:white;
+
+            padding:12px 20px;
+
+            border-radius:10px;
+
+            text-decoration:none;
+
+            margin-top:15px;
+        }
+
+        .buy-btn:hover{
+
+            background:#ef6c00;
+        }
+
+        .heatmap-box{
+
+            background:#f5f5f5;
+
+            padding:15px;
+
+            border-radius:12px;
+
+            margin-top:20px;
+
+            text-align:left;
+        }
+
+        .heatmap-box h3{
+
+            color:#2e7d32;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <h1>🌿 AgroAI</h1>
+
+    <p>
+        AI Precision Agriculture &
+        Smart Nutrient Management
+    </p>
+
+    <!-- HOME -->
+
+    <div id="home"
+         class="section active">
+
+        <div class="container">
+
+            <button onclick="showPage('disease')">
+
+                🌱 Disease Detection
+
+            </button>
+
+            <button onclick="showPage('crop')">
+
+                🌾 Smart Crop Recommendation
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- DISEASE SECTION -->
+
+    <div id="disease"
+         class="section">
+
+        <div class="container">
+
+            <h2>
+                🌱 Disease Detection
+            </h2>
+
+            <input type="file"
+                   id="imageInput"
+                   accept="image/*">
+
+            <button onclick="predictDisease()">
+
+                Detect Disease
+
+            </button>
+
+            <div class="grid">
+
+                <div class="card">
+
+                    <h3>
+                        Uploaded Image
+                    </h3>
+
+                    <img id="previewImage"
+                         class="preview-image">
+
+                </div>
+
+                <div class="card">
+
+                    <h3>
+                        AI Heatmap
+                    </h3>
+
+                    <img id="heatmapImage"
+                         class="preview-image">
+
+                </div>
+
+            </div>
+
+            <div class="heatmap-box">
+
+                <h3>
+                    AI Heatmap Interpretation
+                </h3>
+
+                <p>
+                    🔴 Red → Background Area
+                </p>
+
+                <p>
+                    🟠 Orange → Moderate Infection
+                </p>
+
+                <p>
+                    🟢 Green → Healthy Region
+                </p>
+
+                <p>
+                    🔵 Blue → High Infection
+                </p>
+
+            </div>
+
+            <div id="diseaseResult"
+                 class="result-box">
+            </div>
+
+            <button onclick="showPage('home')">
+
+                Back
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- CROP SECTION -->
+
+    <div id="crop"
+         class="section">
+
+        <div class="container">
+
+            <h2>
+                🌾 Smart Crop Recommendation
+            </h2>
+
+            <!-- INPUTS -->
+
+            <div class="grid">
+
+                <input id="N"
+                       placeholder="Nitrogen">
+
+                <input id="P"
+                       placeholder="Phosphorus">
+
+                <input id="K"
+                       placeholder="Potassium">
+
+                <input id="temp"
+                       placeholder="Temperature">
+
+                <input id="humidity"
+                       placeholder="Humidity">
+
+                <input id="moisture"
+                       placeholder="Moisture">
+
+                <input id="ph"
+                       placeholder="pH">
+
+                <input id="rainfall"
+                       placeholder="Rainfall">
+
+            </div>
+
+            <!-- CROP ANALYSIS DROPDOWN -->
+
+            <div class="card">
+
+                <h3>
+                    Select Crop For Analysis
+                </h3>
+
+                <select id="cropSelector">
+
+                    <option value="Rice">
+                        Rice
+                    </option>
+
+                    <option value="Wheat">
+                        Wheat
+                    </option>
+
+                    <option value="Maize">
+                        Maize
+                    </option>
+
+                    <option value="Cotton">
+                        Cotton
+                    </option>
+
+                    <option value="Sugarcane">
+                        Sugarcane
+                    </option>
+
+                    <option value="Tomato">
+                        Tomato
+                    </option>
+
+                    <option value="Potato">
+                        Potato
+                    </option>
+
+                </select>
+
+            </div>
+
+            <button onclick="predictCrop()">
+
+                Predict Crop
+
+            </button>
+
+            <!-- RESULTS -->
+
+            <div id="cropResult"
+                 class="result-box">
+            </div>
+
+            <!-- DASHBOARD -->
+
+            <div class="grid">
+
+                <!-- SOIL GRAPH -->
+
+                <div class="card">
+
+                    <h3>
+                        Soil Nutrient Graph
+                    </h3>
+
+                    <div class="graph-container">
+
+                        <canvas id="soilChart">
+                        </canvas>
+
+                    </div>
+
+                </div>
+
+                <!-- RADAR GRAPH -->
+
+                <div class="card">
+
+                    <h3>
+                        Current vs Required
+                    </h3>
+
+                    <div class="graph-container">
+
+                        <canvas id="radarChart">
+                        </canvas>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- SOIL HEALTH -->
+
+            <div class="card">
+
+                <h3>
+                    Soil Health Score
+                </h3>
+
+                <div id="healthScore"
+                     class="health-score">
+
+                    0%
+
+                </div>
+
+            </div>
+
+            <button onclick="showPage('home')">
+
+                Back
+
+            </button>
+
+        </div>
+
+    </div>
+
+<script>
+
+    const BASE_URL =
+    "http://127.0.0.1:5000";
+
+    let soilChart;
+    let radarChart;
+
+    // =====================================
+    // PAGE
+    // =====================================
+
+    function showPage(page){
+
+        document
+        .querySelectorAll(".section")
+        .forEach(section=>{
+
+            section.classList.remove(
+                "active"
+            );
+
+        });
+
+        document
+        .getElementById(page)
+        .classList.add("active");
+    }
+
+    // =====================================
+    // DISEASE
+    // =====================================
+
+    async function predictDisease(){
+
+        const file =
+        document
+        .getElementById("imageInput")
+        .files[0];
+
+        if(!file){
+
+            alert(
+                "Upload image"
+            );
+
+            return;
+        }
+
+        document
+        .getElementById("previewImage")
+        .src =
+        URL.createObjectURL(file);
+
+        const formData =
+        new FormData();
+
+        formData.append(
+            "image",
+            file
+        );
+
+        const response =
+        await fetch(
+
+            BASE_URL +
+            "/predict_disease",
+
+            {
+
+                method:"POST",
+
+                body:formData
+            }
+
+        );
+
+        const data =
+        await response.json();
+
+        if(data.status === "success"){
+
+            document
+            .getElementById(
+                "heatmapImage"
+            )
+            .src =
+            data.heatmap_url;
+
+            document
+            .getElementById(
+                "diseaseResult"
+            )
+            .innerHTML =
+
+            `
+            <h3>
+                Disease:
+                ${data.disease}
+            </h3>
+
+            <p>
+                Damage percent:
+                ${data.confidence}%
+            </p>
+
+            <p>
+                Severity:
+                ${data.severity}
+            </p>
+
+            <h3>
+                Solutions
+            </h3>
+
+            <ul>
+
+            ${
+                data.solutions
+                .map(
+
+                    item =>
+
+                    `<li>${item}</li>`
+
+                )
+                .join("")
+            }
+
+            </ul>
+            `;
+        }
+    }
+
+    // =====================================
+    // CROP
+    // =====================================
+
+    async function predictCrop(){
+
+        const values = {
+
+            N:
+            parseFloat(
+                N.value
+            ),
+
+            P:
+            parseFloat(
+                P.value
+            ),
+
+            K:
+            parseFloat(
+                K.value
+            ),
+
+            temperature:
+            parseFloat(
+                temp.value
+            ),
+
+            humidity:
+            parseFloat(
+                humidity.value
+            ),
+
+            moisture:
+            parseFloat(
+                moisture.value
+            ),
+
+            ph:
+            parseFloat(
+                ph.value
+            ),
+
+            rainfall:
+            parseFloat(
+                rainfall.value
+            ),
+
+            selected_crop:
+            document.getElementById(
+                "cropSelector"
+            ).value
+
+        };
+
+        const response =
+        await fetch(
+
+            BASE_URL +
+            "/predict_crop",
+
+            {
+
+                method:"POST",
+
+                headers:{
+
+                    "Content-Type":
+                    "application/json"
+
+                },
+
+                body:
+                JSON.stringify(values)
+
+            }
+
+        );
+
+        const result =
+        await response.json();
+
+        // RESULT
+
+        document
+        .getElementById(
+            "cropResult"
+        )
+        .innerHTML =
+
+        `
+        <h3>
+            Recommended Crop:
+            ${result.recommended_crop}
+        </h3>
+
+        <h3>
+            Analysed Crop:
+            ${result.selected_crop}
+        </h3>
+
+        <h3>
+            Recommended Fertilizer:
+            ${result.fertilizer}
+        </h3>
+
+        <p>
+            Soil Health:
+            ${result.soil_health}%
+        </p>
+
+        <h3>
+            Current Values
+        </h3>
+
+        <ul>
+
+            <li>
+                Nitrogen:
+                ${result.current_values.N}
+            </li>
+
+            <li>
+                Phosphorus:
+                ${result.current_values.P}
+            </li>
+
+            <li>
+                Potassium:
+                ${result.current_values.K}
+            </li>
+
+        </ul>
+
+        <h3>
+            Required Values
+        </h3>
+
+        <ul>
+
+            <li>
+                Nitrogen:
+                ${result.required_values.N}
+            </li>
+
+            <li>
+                Phosphorus:
+                ${result.required_values.P}
+            </li>
+
+            <li>
+                Potassium:
+                ${result.required_values.K}
+            </li>
+
+        </ul>
+
+        <h3>
+            Nutrient Deficiency
+        </h3>
+
+        <ul>
+
+            <li>
+                Nitrogen:
+                ${result.deficiency.N}
+            </li>
+
+            <li>
+                Phosphorus:
+                ${result.deficiency.P}
+            </li>
+
+            <li>
+                Potassium:
+                ${result.deficiency.K}
+            </li>
+
+        </ul>
+
+        <h3>
+            Fertilizer Quantity Per Acre
+        </h3>
+
+        <ul>
+
+            <li>
+                Urea:
+                ${result.fertilizer_quantity.Urea}
+            </li>
+
+            <li>
+                DAP:
+                ${result.fertilizer_quantity.DAP}
+            </li>
+
+            <li>
+                MOP:
+                ${result.fertilizer_quantity.MOP}
+            </li>
+
+        </ul>
+
+        <a href="${result.buy_link}"
+           target="_blank"
+           class="buy-btn">
+
+           Buy Fertilizer
+
+        </a>
+        `;
+
+        // HEALTH SCORE
+
+        document
+        .getElementById(
+            "healthScore"
+        )
+        .innerHTML =
+
+        result.soil_health + "%";
+
+        // DESTROY OLD CHARTS
+
+        if(soilChart){
+
+            soilChart.destroy();
+        }
+
+        if(radarChart){
+
+            radarChart.destroy();
+        }
+
+        // BAR CHART
+
+        soilChart = new Chart(
+
+            document
+            .getElementById(
+                "soilChart"
+            ),
+
+            {
+
+                type:"bar",
+
+                data:{
+
+                    labels:[
+
+                        "Nitrogen",
+                        "Phosphorus",
+                        "Potassium"
+
+                    ],
+
+                    datasets:[
+
+                    {
+
+                        label:
+                        "Current Values",
+
+                        data:[
+
+                            result.current_values.N,
+
+                            result.current_values.P,
+
+                            result.current_values.K
+
+                        ],
+
+                        backgroundColor:[
+
+                            "green",
+                            "orange",
+                            "blue"
+
+                        ]
+                    },
+
+                    {
+
+                        label:
+                        "Required Values",
+
+                        data:[
+
+                            result.required_values.N,
+
+                            result.required_values.P,
+
+                            result.required_values.K
+
+                        ],
+
+                        backgroundColor:[
+
+                            "#1b5e20",
+                            "#ef6c00",
+                            "#1565c0"
+
+                        ]
+                    }
+
+                    ]
+                }
+            }
+        );
+
+        // RADAR CHART
+
+        radarChart = new Chart(
+
+            document
+            .getElementById(
+                "radarChart"
+            ),
+
+            {
+
+                type:"radar",
+
+                data:{
+
+                    labels:[
+
+                        "Nitrogen",
+                        "Phosphorus",
+                        "Potassium"
+
+                    ],
+
+                    datasets:[
+
+                    {
+
+                        label:
+                        "Current",
+
+                        data:[
+
+                            result.current_values.N,
+
+                            result.current_values.P,
+
+                            result.current_values.K
+
+                        ]
+
+                    },
+
+                    {
+
+                        label:
+                        "Required",
+
+                        data:[
+
+                            result.required_values.N,
+
+                            result.required_values.P,
+
+                            result.required_values.K
+
+                        ]
+
+                    }
+
+                    ]
+                }
+            }
+        );
+    }
+
+</script>
+
+</body>
+</html>
